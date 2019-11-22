@@ -32,8 +32,12 @@ _LOGGER = logging.getLogger(__name__)
 # reports back just reported JSON.
 original_stdout = sys.stdout
 sys.stdout = os.fdopen(os.dup(sys.stderr.fileno()), sys.stdout.mode)
-sys.argv.extend(["run", "--python=python3", "-o", "output.json"])
-bench = main()
+sys.argv = ["pyperformance", "run", "--python=python3", "-o", "output.json"]
+try:
+    bench = main()
+except SystemExit as exc:
+    if int(str(exc)) != 0:
+        print("pyperformance did not finish successfully: %d", int(exc), file=sys.stderr)
 
 with open("output.json", "r") as output:
     benchmarks = json.load(output)
